@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -23,7 +23,7 @@ export function AppShell() {
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
       <header className="navbar">
-        <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>mini<span className="brand-light">trello</span><span className="brand-dot">.</span></div>
+        <Link className="brand" to="/inicio" aria-label="Mini Trello — página inicial" draggable={false}><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>mini<span className="brand-light">trello</span><span className="brand-dot">.</span></Link>
         <div className="navbar-context"><span className="separator">/</span> Workspace <span className="badge">PESSOAL</span></div>
         <div className="navbar-actions">
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === 'dark' ? 'claro' : 'escuro'}`}><span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span><span className="theme-label">Tema {theme === 'dark' ? 'claro' : 'escuro'}</span></button>
