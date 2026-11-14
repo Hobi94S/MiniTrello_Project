@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { FoundationPage, IntegrationPage, NotFoundPage } from './pages/Pages';
+import { BoardPage } from './pages/BoardPage';
 
 export function App() {
   return (
@@ -9,7 +10,7 @@ export function App() {
         <Route index element={<Navigate to="/inicio" replace />} />
         <Route path="inicio" element={<FoundationPage />} />
         <Route path="projetos" element={<IntegrationPage kind="projects" />} />
-        <Route path="projetos/:projectId" element={<IntegrationPage kind="board" />} />
+        <Route path="projetos/:projectId" element={<BoardPage />} />
         <Route path="usuarios" element={<IntegrationPage kind="users" />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
