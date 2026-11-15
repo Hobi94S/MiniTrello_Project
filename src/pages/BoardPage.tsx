@@ -9,6 +9,9 @@ import {
   SortableContext, horizontalListSortingStrategy, sortableKeyboardCoordinates, useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useCards } from '../contexts/CardContext';
+import { ColumnCards } from '../components/cards/ColumnCards';
+import { CardForm } from '../components/cards/CardForm';
 import { useApp } from '../contexts/AppContext';
 import {
   COLUMNS_KEY, DEFAULT_COLUMN_TITLES, addColumn, columnsOf, readColumns, removeColumn, renameColumn, reorderColumns,
@@ -28,6 +31,10 @@ function ColumnCard({ column, onRename, onRemove }: {
   onRename: (id: string, title: string) => void;
   onRemove: (column: Column) => void;
 }) {
+  const { getBoard, addCard } = useCards();
+  const board = getBoard(column.projectId);
+  const cards = board?.columns.find((c) => c.id === column.id)?.cards ?? [];
+  const [addingCard, setAddingCard] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(column.title);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: column.id });
@@ -68,8 +75,18 @@ function ColumnCard({ column, onRename, onRemove }: {
         </div>
       </header>
       <div className="column-body">
-        {/* Membro 4 (Caio): cartões desta coluna entram aqui */}
-        <p className="column-empty">Sem cartões ainda.</p>
+        <ColumnCards columnId={column.id} cards={cards} />
+        {addingCard ? (
+          <CardForm
+            onSave={(title, description) => {
+              if (board) addCard(column.id, board.id, title, description);
+              setAddingCard(false);
+            }}
+            onCancel={() => setAddingCard(false)}
+          />
+        ) : (
+          <button className="card-form-add-button" onClick={() => setAddingCard(true)}>+ Adicionar cartão</button>
+        )}
       </div>
     </section>
   );
@@ -81,7 +98,11 @@ export function BoardPage() {
   const projectName = useProjectName(projectId);
   const [newTitle, setNewTitle] = useState('');
 
-  const all = readColumns(state.data[COLUMNS_KEY]);
+  const { boards, getBoard } = useCards();
+  const board = getBoard(projectId);
+  const all = board
+    ? board.columns.map((column) => ({ id: column.id, title: column.title, projectId }))
+    : readColumns(state.data[COLUMNS_KEY]);
   const columns = columnsOf(all, projectId);
 
   const sensors = useSensors(
@@ -90,7 +111,16 @@ export function BoardPage() {
   );
 
   function save(next: Column[]) {
-    dispatch({ type: 'SET_SLICE', key: COLUMNS_KEY, value: next });
+    const id = board?.id ?? `board-${projectId}`;
+    const columns = columnsOf(next, projectId).map((column, order) => ({
+      id: column.id,
+      title: column.title,
+      order,
+      cards: board?.columns.find((existing) => existing.id === column.id)?.cards ?? [],
+    }));
+    dispatch({ type: 'SET_SLICE', key: 'boards', value: {
+      ...boards, [id]: { id, projectId, title: projectName, columns },
+    } });
   }
 
   function onAdd(e: FormEvent) {
