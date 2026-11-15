@@ -46,6 +46,13 @@ Leia `state.data.projects` como `unknown` e valide o formato no módulo antes de
 
 `useTheme()` expõe `theme`, `toggleTheme` e `themeError`. Novos componentes devem usar as variáveis CSS de `src/styles.css` (`--bg`, `--panel`, `--text`, `--muted`, `--line`, `--accent`, `--soft`) para acompanhar o tema.
 
+## Membro 5 (Pedro): detalhes, comentários e histórico
+
+- `src/types/details.ts`: tipos `Comment` e `Activity`, validadores (`readComments`, `readActivities`) e funções puras do módulo. As slices usadas são `comments` e `activities`, relacionadas ao cartão por `cardId`.
+- `src/contexts/CardDetailsContext.tsx`: `useCardDetails()` expõe `currentUser`, `openCard`/`closeCard`, `addComment`, `updateComment`, `deleteComment`, `logActivity` e `clearCardHistory`. O `CardProvider` registra automaticamente as ações de cartão (criado, alterado, movido) e limpa o histórico ao excluir.
+- `src/components/details/`: `CardDetailsModal` (drawer lateral aberto ao clicar no título do cartão ou em "⋯"), `CommentSection` e `ActivityLog`.
+- O autor dos comentários vem de `readCurrentUser`, que lê `state.data.session` (`userId`/`currentUserId`/`id` ou uma string) e `state.data.users` (`id` + `name`/`nome`/`username`). Sem sessão registrada pelo Membro 2, usa o usuário local anônimo.
+
 ## Limites desta entrega
 
 - Membro 2: usuários mockados, sessão, dashboard e CRUD de projetos.

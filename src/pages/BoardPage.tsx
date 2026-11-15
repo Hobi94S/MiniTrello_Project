@@ -12,6 +12,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useCards } from '../contexts/CardContext';
 import { ColumnCards } from '../components/cards/ColumnCards';
 import { CardForm } from '../components/cards/CardForm';
+import { CardDetailsModal } from '../components/details/CardDetailsModal';
 import { useApp } from '../contexts/AppContext';
 import {
   COLUMNS_KEY, DEFAULT_COLUMN_TITLES, addColumn, columnsOf, readColumns, removeColumn, renameColumn, reorderColumns,
@@ -175,6 +176,7 @@ export function BoardPage() {
           </SortableContext>
         </DndContext>
       )}
+      <CardDetailsModal />
     </div>
   );
 }

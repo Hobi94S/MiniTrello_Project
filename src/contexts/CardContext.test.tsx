@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderToString } from 'react-dom/server';
 import { CardProvider, useCards } from './CardContext';
+import { CardDetailsProvider } from './CardDetailsContext';
 import { appReducer, initialState } from '../types/state';
 import type { AppAction, AppState } from '../types/state';
 
@@ -12,7 +13,7 @@ vi.mock('./AppContext', () => ({
 function readCards() {
   let value!: ReturnType<typeof useCards>;
   function Probe() { value = useCards(); return null; }
-  renderToString(<CardProvider><Probe /></CardProvider>);
+  renderToString(<CardDetailsProvider><CardProvider><Probe /></CardProvider></CardDetailsProvider>);
   return value;
 }
 
