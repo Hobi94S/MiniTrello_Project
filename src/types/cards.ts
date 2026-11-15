@@ -1,3 +1,5 @@
+import type { Attachment } from './attachments';
+
 // Tipos de domínio para o módulo de cartões (Membro 4).
 // Estrutura armazenada no AppContext sob a chave 'boards', garantindo
 // consistência entre cartões, colunas e o quadro persistido em localStorage.
@@ -10,6 +12,7 @@ export interface Card {
   order: number;
   createdAt: string;
   updatedAt: string;
+  attachments?: Attachment[];
 }
 
 export interface Column {
@@ -69,5 +72,6 @@ export function createCard({
     order,
     createdAt: now,
     updatedAt: now,
+    attachments: [],
   };
 }

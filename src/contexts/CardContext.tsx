@@ -14,7 +14,7 @@ interface CardContextValue {
   createBoard: (projectId: string, title: string) => string;
   addColumn: (boardId: string, title: string) => string;
   addCard: (columnId: string, boardId: string, title: string, description?: string) => void;
-  updateCard: (cardId: string, updates: Partial<Pick<Card, "title" | "description">>) => void;
+  updateCard: (cardId: string, updates: Partial<Pick<Card, "title" | "description" | "attachments">>) => void;
   deleteCard: (cardId: string) => void;
   moveCard: (cardId: string, targetColumnId: string, targetOrder: number) => void;
   reorderCardsInColumn: (columnId: string, cardIds: string[]) => void;
@@ -97,7 +97,7 @@ export function CardProvider({ children }: { children: ReactNode }) {
   );
 
   const updateCard = useCallback(
-    (cardId: string, updates: Partial<Pick<Card, "title" | "description">>): void => {
+    (cardId: string, updates: Partial<Pick<Card, "title" | "description" | "attachments">>): void => {
       const next = { ...boards };
       let changed = false;
       const changes: string[] = [];

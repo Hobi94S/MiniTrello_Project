@@ -3,6 +3,7 @@ import { useCards } from '../../contexts/CardContext';
 import { useCardDetails } from '../../contexts/CardDetailsContext';
 import type { Card } from '../../types/cards';
 import { CardForm } from './CardForm';
+import { CardAttachments } from './CardAttachments';
 
 interface CardProps {
   card: Card;
@@ -53,9 +54,7 @@ export function Card({ card, onDragStart, onDrop }: CardProps) {
             <button className="card-open-button" onClick={() => openCard(card.id)}>{card.title}</button>
           </h3>
           {card.description && <p className="card-description">{card.description}</p>}
-          {commentCount > 0 && (
-            <span className="card-badge" aria-label={`${commentCount} comentário${commentCount > 1 ? 's' : ''}`}>💬 {commentCount}</span>
-          )}
+          <CardAttachments card={card} />
         </>
       )}
     </div>
