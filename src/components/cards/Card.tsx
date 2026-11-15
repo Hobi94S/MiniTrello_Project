@@ -14,9 +14,7 @@ interface CardProps {
 export function Card({ card, onDragStart, onDrop }: CardProps) {
   const [editing, setEditing] = useState(false);
   const { updateCard, deleteCard } = useCards();
-  const { openCard, commentsOf } = useCardDetails();
-  const commentCount = commentsOf(card.id).length;
-
+ const { openCard } = useCardDetails();
   const handleSave = (title: string, description: string) => {
     updateCard(card.id, { title, description });
     setEditing(false);
