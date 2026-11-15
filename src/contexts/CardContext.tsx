@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import { readColumns } from "../types/board";
 import { useApp } from "../contexts/AppContext";
+import { useCardDetails } from "../contexts/CardDetailsContext";
 import { createCard, newBoardId, newColumnId, nowISO } from "../types/cards";
 import type { Board, Card, Column } from "../types/cards";
 
@@ -13,7 +14,7 @@ interface CardContextValue {
   createBoard: (projectId: string, title: string) => string;
   addColumn: (boardId: string, title: string) => string;
   addCard: (columnId: string, boardId: string, title: string, description?: string) => void;
-  updateCard: (cardId: string, updates: Partial<Pick<Card, "title" | "description">>) => void;
+  updateCard: (cardId: string, updates: Partial<Pick<Card, "title" | "description" | "attachments">>) => void;
   deleteCard: (cardId: string) => void;
   moveCard: (cardId: string, targetColumnId: string, targetOrder: number) => void;
   reorderCardsInColumn: (columnId: string, cardIds: string[]) => void;
@@ -23,6 +24,8 @@ const CardContext = createContext<CardContextValue | null>(null);
 
 export function CardProvider({ children }: { children: ReactNode }) {
   const { state, dispatch } = useApp();
+  // Histórico de atividades (Membro 5): cada mutação registra uma entrada.
+  const { logActivity, clearCardHistory } = useCardDetails();
 
   const boards = useMemo(() => {
     const raw = state.data[BOARDS_KEY];
@@ -88,14 +91,16 @@ export function CardProvider({ children }: { children: ReactNode }) {
       });
       const next = { ...boards, [boardId]: { ...board, columns: nextColumns } };
       save(next);
+      logActivity(card.id, 'created', `Cartão criado na coluna "${column.title}"`);
     },
-    [boards, save]
+    [boards, save, logActivity]
   );
 
   const updateCard = useCallback(
-    (cardId: string, updates: Partial<Pick<Card, "title" | "description">>): void => {
+    (cardId: string, updates: Partial<Pick<Card, "title" | "description" | "attachments">>): void => {
       const next = { ...boards };
       let changed = false;
+      const changes: string[] = [];
       for (const boardId of Object.keys(next)) {
         const board = next[boardId];
         const newColumns = board.columns.map((col) => {
@@ -103,6 +108,8 @@ export function CardProvider({ children }: { children: ReactNode }) {
           if (cardIdx === -1) return col;
           changed = true;
           const card = col.cards[cardIdx];
+          if (updates.title !== undefined && updates.title !== card.title) changes.push(`Título alterado para "${updates.title}"`);
+          if (updates.description !== undefined && updates.description !== card.description) changes.push('Descrição atualizada');
           const updatedCard: Card = {
             ...card,
             ...updates,
@@ -118,9 +125,11 @@ export function CardProvider({ children }: { children: ReactNode }) {
           break;
         }
       }
-      if (changed) save(next);
+      if (!changed) return;
+      save(next);
+      if (changes.length > 0) logActivity(cardId, 'updated', changes.join('; '));
     },
-    [boards, save]
+    [boards, save, logActivity]
   );
 
   const deleteCard = useCallback((cardId: string): void => {
@@ -142,8 +151,10 @@ export function CardProvider({ children }: { children: ReactNode }) {
         break;
       }
     }
-    if (changed) save(next);
-  }, [boards, save]);
+    if (!changed) return;
+    save(next);
+    clearCardHistory(cardId);
+  }, [boards, save, clearCardHistory]);
 
   const moveCard = useCallback(
     (cardId: string, targetColumnId: string, targetOrder: number): void => {
@@ -215,8 +226,11 @@ export function CardProvider({ children }: { children: ReactNode }) {
       };
 
       save(next);
+      if (sourceColumnId !== targetColumnId) {
+        logActivity(cardId, 'moved', `Cartão movido para "${targetColumn.title}"`);
+      }
     },
-    [boards, save]
+    [boards, save, logActivity]
   );
 
   const reorderCardsInColumn = useCallback(

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import type { Dispatch, ReactNode } from 'react';
 import { appReducer, initialState, parseState, STORAGE_KEY } from '../types/state';
 import type { AppAction, AppState } from '../types/state';
@@ -23,8 +23,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [loaded] = useState(loadState);
   const [state, dispatch] = useReducer(appReducer, loaded.state);
   const [storageError, setStorageError] = useState<string | null>(loaded.error);
+  const remoteStates = useRef(new WeakSet<AppState>());
 
   useEffect(() => {
+    function onStorage(event: StorageEvent) {
+      if (event.key !== STORAGE_KEY && event.key !== null) return;
+      try {
+        if (event.storageArea !== window.localStorage) return;
+        const nextState = parseState(event.newValue);
+        remoteStates.current.add(nextState);
+        dispatch({ type: 'REPLACE_STATE', state: nextState });
+        setStorageError(null);
+      } catch {
+        setStorageError('Não foi possível sincronizar os dados recebidos de outra aba. Os dados atuais foram mantidos.');
+      }
+    }
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
+    if (remoteStates.current.has(state)) return;
     // Preserve unreadable stored data until a feature explicitly changes state.
     if (loaded.error && state === loaded.state) return;
     try {

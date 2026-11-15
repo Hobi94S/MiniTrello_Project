@@ -6,7 +6,8 @@ export interface AppState {
 
 export type AppAction =
   | { type: 'SET_SLICE'; key: string; value: unknown }
-  | { type: 'REMOVE_SLICE'; key: string };
+  | { type: 'REMOVE_SLICE'; key: string }
+  | { type: 'REPLACE_STATE'; state: AppState };
 
 export const STORAGE_KEY = 'mini-trello:state';
 export const initialState: AppState = { version: 1, data: {} };
@@ -24,6 +25,7 @@ export function parseState(raw: string | null): AppState {
 }
 
 export function appReducer(state: AppState, action: AppAction): AppState {
+  if (action.type === 'REPLACE_STATE') return action.state;
   if (action.type === 'SET_SLICE') {
     return { ...state, data: { ...state.data, [action.key]: action.value } };
   }
