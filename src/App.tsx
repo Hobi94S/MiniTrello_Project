@@ -3,9 +3,11 @@ import { AppShell } from './components/AppShell';
 import { FoundationPage, IntegrationPage, NotFoundPage } from './pages/Pages';
 import { BoardPage } from './pages/BoardPage';
 import { CardProvider } from './contexts/CardContext';
+import { CardDetailsProvider } from './contexts/CardDetailsContext';
 
 export function App() {
   return (
+    <CardDetailsProvider>
     <CardProvider>
       <Routes>
         <Route element={<AppShell />}>
@@ -18,5 +20,6 @@ export function App() {
         </Route>
       </Routes>
     </CardProvider>
+    </CardDetailsProvider>
   );
 }
