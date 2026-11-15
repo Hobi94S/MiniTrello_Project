@@ -54,4 +54,4 @@ Leia `state.data.projects` como `unknown` e valide o formato no módulo antes de
 - Membro 5: detalhes, comentários e histórico.
 - Membro 6: anexos, listener de `StorageEvent` para sincronização entre abas, animações e polimento geral.
 
-Essas funcionalidades não estão implementadas. A responsividade do shell pertence à base do Membro 1. Não há listener de sincronização multi-aba nesta entrega.
+O Membro 6 permite anexos de até 1 MB por arquivo nos cartões, serializados como Data URL/Base64 dentro do estado salvo no navegador. A sincronização escuta alterações da chave `mini-trello:state` em outras abas da mesma origem; o navegador e a disponibilidade/cota do `localStorage` continuam sendo limites da persistência. A interface também sinaliza colunas vazias e respeita a preferência por movimento reduzido.

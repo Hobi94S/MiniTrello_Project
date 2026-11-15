@@ -16,4 +16,9 @@ describe('shared persistence contract', () => {
       expect(() => parseState(raw)).toThrow();
     }
   });
+
+  it('replaces the full snapshot when another tab publishes state', () => {
+    const remote = { version: 1 as const, data: { boards: { b1: { title: 'Updated' } } } };
+    expect(appReducer(initialState, { type: 'REPLACE_STATE', state: remote })).toBe(remote);
+  });
 });

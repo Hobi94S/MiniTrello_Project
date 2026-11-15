@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCards } from '../../contexts/CardContext';
 import type { Card } from '../../types/cards';
 import { CardForm } from './CardForm';
+import { CardAttachments } from './CardAttachments';
 
 interface CardProps {
   card: Card;
@@ -47,6 +48,7 @@ export function Card({ card, onDragStart, onDrop }: CardProps) {
         <>
           <h3 className="card-title">{card.title}</h3>
           {card.description && <p className="card-description">{card.description}</p>}
+          <CardAttachments card={card} />
         </>
       )}
     </div>

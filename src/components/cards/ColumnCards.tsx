@@ -78,6 +78,7 @@ export function ColumnCards({ columnId, cards }: ColumnCardsProps) {
         marginBottom: '16px',
       }}
     >
+      {sortedCards.length === 0 && <p className="card-list-empty">Solte um cartão aqui ou crie um novo.</p>}
       {sortedCards.map((card, index) => (
         <CardComponent
           key={card.id}
