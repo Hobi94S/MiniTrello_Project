@@ -7,7 +7,6 @@ import {
   PROJECTS_KEY,
   addProject,
   readProjects,
-  removeProject,
   updateProject,
 } from '../types/projects';
 
@@ -50,13 +49,14 @@ export function ProjectsPage() {
   }
 
   function handleDelete(id: string) { //exlcui projetos
-    if (window.confirm('Deseja realmente excluir este projeto?')) {
-      saveProjects(removeProject(projects, id));
+    if (window.confirm('Excluir este projeto e todos os seus quadros, cartões e comentários?')) {
+      dispatch({ type: 'DELETE_PROJECT', projectId: id });
+      if (editingId === id) { setEditingId(null); setName(''); setDescription(''); }
     }
   }
 
   return (
-    <main className="integration-page">
+    <div className="integration-page">
       <header className="page-heading">
         <h1>Meus projetos</h1>
         <p>Organize e acompanhe seus projetos.</p>
@@ -65,20 +65,24 @@ export function ProjectsPage() {
       <form onSubmit={handleSubmit} className="project-form">
         <h2>{editingId ? 'Editar projeto' : 'Novo projeto'}</h2>
 
+        <label>Nome do projeto
         <input
+          aria-label="Nome do projeto"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nome do projeto"
           maxLength={60}
           required
-        />
+        /></label>
 
+        <label>Descrição do projeto
         <textarea
+          aria-label="Descrição do projeto"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Descrição do projeto"
           maxLength={300}
-        />
+        /></label>
 
         <button type="submit">
           {editingId ? 'Salvar alterações' : 'Criar projeto'}
@@ -119,6 +123,6 @@ export function ProjectsPage() {
           </article>
         ))}
       </section>
-    </main>
+    </div>
   );
 }

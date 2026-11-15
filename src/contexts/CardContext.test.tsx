@@ -51,4 +51,19 @@ describe('merged board and card persistence', () => {
     } });
     expect(readCards().getBoard('p1')!.columns).toEqual([]);
   });
+
+  it('rejects incomplete or duplicate reorder lists and keeps contiguous orders after deletion', () => {
+    const board = readCards().getBoard('p1')!;
+    readCards().addCard('todo', board.id, 'One');
+    readCards().addCard('todo', board.id, 'Two');
+    const cards = readCards().getBoard('p1')!.columns[0].cards;
+    const before = JSON.stringify(state);
+    readCards().reorderCardsInColumn('todo', [cards[0].id]);
+    readCards().reorderCardsInColumn('todo', [cards[0].id, cards[0].id]);
+    expect(JSON.stringify(state)).toBe(before);
+    readCards().reorderCardsInColumn('todo', [cards[1].id, cards[0].id]);
+    expect(readCards().getBoard('p1')!.columns[0].cards.map((card) => card.title)).toEqual(['Two', 'One']);
+    readCards().deleteCard(cards[1].id);
+    expect(readCards().getBoard('p1')!.columns[0].cards).toEqual([expect.objectContaining({ title: 'One', order: 0 })]);
+  });
 });

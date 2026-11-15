@@ -164,8 +164,8 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 }
 
 .project-form {
-  background: #252525;
-  border: 1px solid #3b3b3b;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 25px;
   margin-bottom: 35px;
@@ -185,10 +185,10 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
   width: 100%;
   box-sizing: border-box;
   padding: 13px 15px;
-  border: 1px solid #555;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #181818;
-  color: #fff;
+  background: var(--bg);
+  color: var(--text);
   font: inherit;
   outline: none;
 }
@@ -200,7 +200,7 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 
 .project-form input:focus,
 .project-form textarea:focus {
-  border-color: #8bc49a;
+  border-color: var(--accent);
 }
 
 .project-form button,
@@ -214,18 +214,18 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 }
 
 .project-form button {
-  background: #8bc49a;
-  color: #142018;
+  background: var(--accent);
+  color: var(--button-text);
   justify-self: start;
 }
 
 .project-form button:hover {
-  background: #a5d9b2;
+  background: var(--accent);
 }
 
 .project-form button[type="button"] {
-  background: #444;
-  color: white;
+  background: var(--soft);
+  color: var(--text);
 }
 
 .project-list {
@@ -240,8 +240,8 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 }
 
 .project-card {
-  background: #252525;
-  border: 1px solid #3b3b3b;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 22px;
   transition: transform 0.2s, border-color 0.2s;
@@ -249,7 +249,7 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 
 .project-card:hover {
   transform: translateY(-3px);
-  border-color: #8bc49a;
+  border-color: var(--accent);
 }
 
 .project-card h3 {
@@ -258,14 +258,14 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 }
 
 .project-card p {
-  color: #bdbdbd;
+  color: var(--muted);
   line-height: 1.5;
   margin-bottom: 20px;
 }
 
 .project-card a {
   display: inline-block;
-  color: #a5d9b2;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 600;
   margin-right: 12px;
@@ -277,20 +277,20 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
 
 .project-card button {
   margin: 12px 7px 0 0;
-  background: #3d3d3d;
-  color: white;
+  background: var(--soft);
+  color: var(--text);
 }
 
 .project-card button:hover {
-  background: #555;
+  background: var(--line);
 }
 
 .project-card button:last-child {
-  background: #713d3d;
+  background: var(--soft);
 }
 
 .project-card button:last-child:hover {
-  background: #914c4c;
+  background: var(--line);
 }
 
 @media (max-width: 650px) {
@@ -380,3 +380,51 @@ h1 { font-size: clamp(44px, 4.5vw, 68px); line-height: 1.12; font-weight: 500; l
   }
   .card:hover { border-color: var(--line); box-shadow: 0 4px 12px rgba(0, 0, 0, .09); }
 }
+
+/* Layout compartilhado por projetos e sessão. */
+#main-content { min-width: 0; padding-top: 48px; padding-bottom: 48px; }
+.integration-page { padding: 0; }
+.user-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 20px; }
+.session-link { font-size: 12px; color: var(--accent); }
+.session-exit { margin-top: 24px; }
+button:disabled { cursor: default; opacity: .55; }
+.project-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+.project-card { min-width: 0; overflow-wrap: anywhere; }
+.project-form label { display: grid; gap: 8px; font-size: 13px; }
+.details-backdrop { position: fixed; inset: 0; z-index: 50; background: #0008; display: flex; justify-content: flex-end; }
+.details-panel { width: min(100%, 620px); height: 100%; overflow-y: auto; background: var(--bg); padding: 28px; box-shadow: -8px 0 32px #0002; }
+.details-header { display: flex; gap: 16px; align-items: flex-start; }
+.details-heading { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.details-heading h2 { margin: 8px 0; font-size: 26px; }
+.details-heading .eyebrow { margin: 0; }
+.details-actions { display: flex; gap: 6px; }
+.details-actions button, .comment-actions button { border: 0; padding: 7px; color: var(--muted); background: var(--soft); border-radius: 4px; }
+.details-description, .comment-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.details-dates, .details-empty, .comment-time { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.details-section { border-top: 1px solid var(--line); padding: 20px 0; }
+.details-section-title { font-size: 16px; margin: 0 0 16px; }
+.comment-list, .activity-list { list-style: none; padding: 0; display: grid; gap: 16px; }
+.comment-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.comment-author { font-size: 13px; font-weight: 600; }
+.comment-actions { margin-left: auto; display: flex; gap: 4px; }
+.comment-form { display: grid; gap: 10px; }
+.activity { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .navbar { padding-inline: 16px; }
+  .navbar-actions { gap: 10px; }
+  .brand-mark { margin-right: 6px; }
+  .details-panel { padding: 20px; }
+  .details-header { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .details-panel { animation: drawer-enter 180ms ease-out; }
+  @keyframes drawer-enter { from { transform: translateX(24px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.card-open-button { border: 0; padding: 0; background: transparent; color: inherit; text-align: left; font: inherit; }
+.activity { display: flex; gap: 12px; }
+.activity-message { margin: 0 0 4px; }
+.activity-meta { color: var(--muted); }

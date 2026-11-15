@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   ANONYMOUS_USER, activitiesOf, addComment, appendActivity, commentsOf, editComment, pruneByCard,
   readActivities, readComments, readCurrentUser, removeComment,
@@ -36,5 +36,16 @@ describe('comments and activities contract', () => {
     expect(readCurrentUser({ session: { currentUserId: 'u2' }, users: [{ id: 'u2', name: 'Rebecca' }] }))
       .toEqual({ id: 'u2', name: 'Rebecca' });
     expect(readCurrentUser({ session: 'u3', users: [{ id: 'u3', nome: 'Jr' }] })).toEqual({ id: 'u3', name: 'Jr' });
+  });
+
+  it('orders actions deterministically when they share the same millisecond', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      const created = appendActivity([], 'c1', 'created', 'Criado', user);
+      const log = appendActivity(created, 'c1', 'moved', 'Movido', user);
+      expect(activitiesOf(log, 'c1').map((item) => item.type)).toEqual(['moved', 'created']);
+      expect(activitiesOf([...log].reverse(), 'c1').map((item) => item.type)).toEqual(['moved', 'created']);
+    } finally { vi.useRealTimers(); }
   });
 });

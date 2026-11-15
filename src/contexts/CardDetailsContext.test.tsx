@@ -66,4 +66,19 @@ describe('card details, comments and audit trail', () => {
     state = { ...initialState, data: {} };
     expect(read().details.currentUser).toEqual({ id: 'anonimo', name: 'Usuário local' });
   });
+
+  it('keeps the original author after switching users and protects their comments', () => {
+    read().details.addComment('c1', 'Original');
+    const comment = read().details.commentsOf('c1')[0];
+    state = appReducer(state, { type: 'SET_SLICE', key: 'users', value: [{ id: 'u1', name: 'Pedro' }, { id: 'u2', name: 'Outro' }] });
+    state = appReducer(state, { type: 'SET_SLICE', key: 'session', value: { userId: 'u2' } });
+    read().details.updateComment(comment.id, 'Alterado');
+    read().details.deleteComment(comment.id);
+    read().details.addComment('c1', 'Novo');
+    expect(read().details.commentsOf('c1')).toEqual([
+      expect.objectContaining({ authorId: 'u1', text: 'Original' }),
+      expect.objectContaining({ authorId: 'u2', text: 'Novo' }),
+    ]);
+    expect(read().details.activitiesOf('c1')[0].actorId).toBe('u2');
+  });
 });

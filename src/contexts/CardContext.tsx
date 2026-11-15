@@ -143,7 +143,7 @@ export function CardProvider({ children }: { children: ReactNode }) {
         changed = true;
         return {
           ...col,
-          cards: col.cards.filter((c) => c.id !== cardId),
+          cards: col.cards.filter((c) => c.id !== cardId).map((c, order) => ({ ...c, order })),
         };
       });
       if (changed) {
@@ -243,6 +243,8 @@ export function CardProvider({ children }: { children: ReactNode }) {
         if (colIdx === -1) continue;
         changed = true;
         const column = board.columns[colIdx];
+        if (cardIds.length !== column.cards.length || new Set(cardIds).size !== cardIds.length ||
+          cardIds.some((id) => !column.cards.some((card) => card.id === id))) return;
         const cardMap = new Map(column.cards.map((c) => [c.id, c]));
         const newCards = cardIds.map((cid, i) => {
           const c = cardMap.get(cid);

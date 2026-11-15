@@ -1,64 +1,65 @@
-# Mini Trello — Membro 1 (Gutemberg)
+# Mini Trello — Entrega 1
 
-Base da aplicação em Vite, React e TypeScript. Esta entrega cobre somente infraestrutura, estado global, roteamento, Navbar, Sidebar responsiva e temas claro/escuro.
+Projeto da disciplina **Criar Serviços com Web REST**, do curso de **Sistemas da Informação da Unifacisa**.
 
-## Executar
+O Mini Trello é uma aplicação para organizar projetos e tarefas em quadros Kanban. Nesta entrega, tudo funciona no navegador: a sessão é simulada e os dados são salvos no `localStorage`, sem backend.
 
-Requer Node.js 20.19+ ou 22.12+ compatível com Vite 7.
+## Como executar
+
+Use Node.js 20.19+ ou 22.12+.
 
 ```sh
 npm install
 npm run dev
 ```
 
+Abra o endereço indicado pelo Vite no terminal.
+
+Para verificar o projeto e gerar a versão de produção:
+
 ```sh
-npm run build
 npm test
+npm run build
 npm run preview
 ```
 
-## Estrutura e rotas
+## Funcionalidades
 
-- `src/components/AppShell.tsx`: layout compartilhado, menu responsivo e alternância de tema.
-- `src/contexts/ThemeContext.tsx`: tema global, persistido em `mini-trello:theme`. A primeira visita respeita o tema do sistema.
-- `src/contexts/AppContext.tsx`: leitura inicial e escrita do estado em `mini-trello:state`.
-- `src/types/state.ts`: contrato versionado e reducer do estado global.
-- `src/App.tsx`: `/` redireciona para `/inicio`; `/projetos`, `/projetos/:projectId` e `/usuarios` são pontos de integração. Há uma página 404 para endereços desconhecidos.
-- `src/pages/Pages.tsx`: apresentação da base e placeholders explícitos, sem dados de projetos fictícios.
+- Seleção e alternância entre três usuários de demonstração, com opção de sair da sessão.
+- Dashboard com criação, edição e exclusão de projetos.
+- Quadro Kanban com criação, renomeação, exclusão e reordenação de colunas.
+- Cartões com edição rápida, exclusão e arrastar e soltar entre colunas ou na mesma coluna.
+- Painel de detalhes com comentários e histórico de atividades.
+- Autoria vinculada ao usuário selecionado, com edição e exclusão dos próprios comentários.
+- Upload, download e remoção de anexos de até 1 MB por arquivo.
+- Temas claro e escuro, menu responsivo e sincronização entre abas.
 
-Em hospedagem estática, configure fallback de todas as rotas para `index.html` para permitir acesso direto às rotas do BrowserRouter.
+As alterações ficam salvas ao recarregar a página. Ao excluir um projeto ou uma coluna, seus cartões, anexos, comentários e atividades também são removidos.
 
-## Integração dos módulos
+## Como usar
 
-O estado usa `{ version: 1, data: Record<string, unknown> }`. Cada responsável define e valida os tipos de seu módulo. Valores devem ser serializáveis em JSON. Use chaves distintas por módulo para preservar os demais dados:
+1. Acesse **Usuários** e escolha uma sessão de demonstração.
+2. Em **Projetos**, crie um projeto e clique em **Abrir quadro**.
+3. Crie suas colunas ou use **Criar colunas padrão**.
+4. Adicione cartões. Use o ícone de arrastar no cabeçalho para reorganizar colunas e arraste os cartões para organizar as tarefas.
+5. Clique no título de um cartão ou em **⋯** para abrir seus detalhes, comentários e histórico.
 
-```tsx
-import { useApp } from './contexts/AppContext';
+## Tecnologias e organização
 
-const { state, dispatch, storageError } = useApp();
-// Dentro de um handler do módulo, após validar os próprios dados:
-dispatch({ type: 'SET_SLICE', key: 'projects', value: projects });
-// Remover apenas os dados de um módulo:
-dispatch({ type: 'REMOVE_SLICE', key: 'projects' });
-```
+O projeto usa React, TypeScript, Vite, React Router e dnd-kit. Os testes são executados com Vitest.
 
-Leia `state.data.projects` como `unknown` e valide o formato no módulo antes de usá-lo. O reducer atualiza o estado de forma imutável. A gravação acontece após as atualizações do React. A interface exibe erros de leitura/gravação e mantém as alterações em memória quando o armazenamento falha. Dados ilegíveis não são sobrescritos na inicialização; uma alteração explícita de estado passa a salvar o novo estado. A persistência depende da origem e do navegador, sem backend.
+- `src/pages`: dashboard, usuários e quadro Kanban.
+- `src/components`: layout, cartões e painel de detalhes.
+- `src/contexts`: estado global, tema, cartões e interações.
+- `src/types`: modelos, regras de manipulação dos dados e testes.
+- `src/styles.css`: estilos, temas e responsividade.
 
-`useTheme()` expõe `theme`, `toggleTheme` e `themeError`. Novos componentes devem usar as variáveis CSS de `src/styles.css` (`--bg`, `--panel`, `--text`, `--muted`, `--line`, `--accent`, `--soft`) para acompanhar o tema.
+As rotas principais são `/inicio`, `/projetos`, `/projetos/:projectId` e `/usuarios`. Em hospedagem estática, configure o redirecionamento das rotas para `index.html`.
 
-## Membro 5 (Pedro): detalhes, comentários e histórico
+## Persistência e limites
 
-- `src/types/details.ts`: tipos `Comment` e `Activity`, validadores (`readComments`, `readActivities`) e funções puras do módulo. As slices usadas são `comments` e `activities`, relacionadas ao cartão por `cardId`.
-- `src/contexts/CardDetailsContext.tsx`: `useCardDetails()` expõe `currentUser`, `openCard`/`closeCard`, `addComment`, `updateComment`, `deleteComment`, `logActivity` e `clearCardHistory`. O `CardProvider` registra automaticamente as ações de cartão (criado, alterado, movido) e limpa o histórico ao excluir.
-- `src/components/details/`: `CardDetailsModal` (drawer lateral aberto ao clicar no título do cartão ou em "⋯"), `CommentSection` e `ActivityLog`.
-- O autor dos comentários vem de `readCurrentUser`, que lê `state.data.session` (`userId`/`currentUserId`/`id` ou uma string) e `state.data.users` (`id` + `name`/`nome`/`username`). Sem sessão registrada pelo Membro 2, usa o usuário local anônimo.
+Os dados são armazenados na chave `mini-trello:state`, e o tema em `mini-trello:theme`. Os anexos são convertidos para Data URL/Base64 e fazem parte do estado salvo.
 
-## Limites desta entrega
+O armazenamento pertence ao navegador e à origem utilizada. Limpar os dados do site remove os registros; abrir em outro navegador não os transfere. A sincronização ocorre entre abas da mesma origem, sem comunicação entre dispositivos. Alterações simultâneas seguem o último estado salvo.
 
-- Membro 2: usuários mockados, sessão, dashboard e CRUD de projetos.
-- Membro 3: quadro Kanban, colunas e drag and drop horizontal.
-- Membro 4: cartões, drag and drop de cartões e integridade dos relacionamentos.
-- Membro 5: detalhes, comentários e histórico.
-- Membro 6: anexos, listener de `StorageEvent` para sincronização entre abas, animações e polimento geral.
-
-O Membro 6 permite anexos de até 1 MB por arquivo nos cartões, serializados como Data URL/Base64 dentro do estado salvo no navegador. A sincronização escuta alterações da chave `mini-trello:state` em outras abas da mesma origem; o navegador e a disponibilidade/cota do `localStorage` continuam sendo limites da persistência. A interface também sinaliza colunas vazias e respeita a preferência por movimento reduzido.
+A sessão de demonstração não oferece autenticação real. O tamanho total dos dados depende da cota de `localStorage` do navegador. Se a gravação falhar, a aplicação avisa e mantém as alterações em memória enquanto a página estiver aberta.

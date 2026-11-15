@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { readCurrentUser } from '../types/details';
 import { useApp } from '../contexts/AppContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -8,7 +9,8 @@ export function AppShell() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const location = useLocation();
   const { theme, toggleTheme, themeError } = useTheme();
-  const { storageError } = useApp();
+  const { storageError, state } = useApp();
+  const currentUser = readCurrentUser(state.data);
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
   useEffect(() => {
     if (!menuOpen) return;
@@ -26,6 +28,7 @@ export function AppShell() {
         <Link className="brand" to="/inicio" aria-label="Mini Trello — página inicial" draggable={false}><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>mini<span className="brand-light">trello</span><span className="brand-dot">.</span></Link>
         <div className="navbar-context"><span className="separator">/</span> Workspace <span className="badge">PESSOAL</span></div>
         <div className="navbar-actions">
+          <Link className="session-link" to="/usuarios">{currentUser.id === 'anonimo' ? 'Entrar' : currentUser.name}</Link>
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === 'dark' ? 'claro' : 'escuro'}`}><span aria-hidden="true">{theme === 'dark' ? '☀' : '☾'}</span><span className="theme-label">Tema {theme === 'dark' ? 'claro' : 'escuro'}</span></button>
           <button ref={menuButton} className="menu-button" aria-controls="sidebar" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>Menu <span aria-hidden="true">☰</span></button>
         </div>

@@ -56,13 +56,15 @@ export function CardDetailsProvider({ children }: { children: ReactNode }) {
   }, [comments, activities, currentUser, saveComments, saveActivities]);
 
   const handleUpdateComment = useCallback((commentId: string, text: string) => {
+    if (!comments.some((comment) => comment.id === commentId && comment.authorId === currentUser.id)) return;
     const next = editComment(comments, commentId, text);
     if (next !== comments) saveComments(next);
-  }, [comments, saveComments]);
+  }, [comments, currentUser.id, saveComments]);
 
   const handleDeleteComment = useCallback((commentId: string) => {
+    if (!comments.some((comment) => comment.id === commentId && comment.authorId === currentUser.id)) return;
     saveComments(removeComment(comments, commentId));
-  }, [comments, saveComments]);
+  }, [comments, currentUser.id, saveComments]);
 
   const clearCardHistory = useCallback((cardId: string) => {
     saveComments(pruneByCard(comments, cardId));

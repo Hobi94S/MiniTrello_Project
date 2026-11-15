@@ -20,6 +20,7 @@ export interface Comment {
 export type ActivityType = 'created' | 'updated' | 'moved' | 'deleted' | 'commented';
 
 export interface Activity {
+  sequence?: number;
   id: string;
   cardId: string;
   type: ActivityType;
@@ -34,7 +35,7 @@ export const ACTIVITIES_KEY = 'activities';
 export const SESSION_KEY = 'session';
 export const USERS_KEY = 'users';
 
-// Usado quando o Membro 2 ainda não registrou uma sessão simulada.
+// Permite usar o quadro sem uma sessão selecionada.
 export const ANONYMOUS_USER: SessionUser = { id: 'anonimo', name: 'Usuário local' };
 
 function newId(prefix: string) {
@@ -101,7 +102,8 @@ export function commentsOf(all: Comment[], cardId: string): Comment[] {
 export function activitiesOf(all: Activity[], cardId: string): Activity[] {
   return all
     .filter((a) => a.cardId === cardId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    .reverse()
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || (b.sequence ?? 0) - (a.sequence ?? 0));
 }
 
 export function addComment(all: Comment[], cardId: string, author: SessionUser, text: string): Comment[] {
@@ -127,6 +129,7 @@ export function appendActivity(
   all: Activity[], cardId: string, type: ActivityType, message: string, actor: SessionUser,
 ): Activity[] {
   return [...all, {
+    sequence: all.reduce((max, item) => Math.max(max, item.sequence ?? 0), 0) + 1,
     id: newId('activity'), cardId, type, message, actorId: actor.id, actorName: actor.name, createdAt: new Date().toISOString(),
   }];
 }

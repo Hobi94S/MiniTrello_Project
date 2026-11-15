@@ -15,8 +15,9 @@ import { CardForm } from '../components/cards/CardForm';
 import { CardDetailsModal } from '../components/details/CardDetailsModal';
 import { useApp } from '../contexts/AppContext';
 import {
-  COLUMNS_KEY, DEFAULT_COLUMN_TITLES, addColumn, columnsOf, readColumns, removeColumn, renameColumn, reorderColumns,
+  COLUMNS_KEY, DEFAULT_COLUMN_TITLES, addColumn, columnsOf, readColumns, renameColumn, reorderColumns,
 } from '../types/board';
+import { readProjects } from '../types/projects';
 import type { Column } from '../types/board';
 
 function useProjectName(projectId: string) {
@@ -131,7 +132,7 @@ export function BoardPage() {
   }
 
   function onRemove(column: Column) {
-    if (window.confirm(`Remover a coluna "${column.title}"?`)) save(removeColumn(all, column.id));
+    if (window.confirm(`Remover a coluna "${column.title}" e seus cartões?`)) dispatch({ type: 'DELETE_COLUMN', columnId: column.id });
   }
 
   function onDragEnd({ active, over }: DragEndEvent) {
@@ -140,6 +141,10 @@ export function BoardPage() {
 
   function createDefaults() {
     save(DEFAULT_COLUMN_TITLES.reduce((acc, title) => addColumn(acc, projectId, title), all));
+  }
+
+  if (!readProjects(state.data.projects).some((project) => project.id === projectId)) {
+    return <section className="board-empty"><h1>Projeto não encontrado</h1><Link className="text-link" to="/projetos">Voltar aos projetos</Link></section>;
   }
 
   return (

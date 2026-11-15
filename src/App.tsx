@@ -3,8 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import { CardProvider } from './contexts/CardContext';
 import { CardDetailsProvider } from './contexts/CardDetailsContext';
-import { FoundationPage, IntegrationPage, NotFoundPage } from './pages/Pages';
+import { NotFoundPage } from './pages/Pages';
 import { BoardPage } from './pages/BoardPage';
+import { UsersPage } from './pages/UsersPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 
 export function App() {
@@ -14,10 +15,10 @@ export function App() {
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<Navigate to="/inicio" replace />} />
-            <Route path="inicio" element={<FoundationPage />} />
+            <Route path="inicio" element={<ProjectsPage />} />
             <Route path="projetos" element={<ProjectsPage />} />
             <Route path="projetos/:projectId" element={<BoardPage />} />
-            <Route path="usuarios" element={<IntegrationPage kind="users" />} />
+            <Route path="usuarios" element={<UsersPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

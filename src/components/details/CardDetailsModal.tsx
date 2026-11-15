@@ -3,6 +3,7 @@ import { useCards } from '../../contexts/CardContext';
 import { useCardDetails } from '../../contexts/CardDetailsContext';
 import { formatDateTime } from '../../types/details';
 import type { Card, Column } from '../../types/cards';
+import { CardAttachments } from '../cards/CardAttachments';
 import { CardForm } from '../cards/CardForm';
 import { CommentSection } from './CommentSection';
 import { ActivityLog } from './ActivityLog';
@@ -28,16 +29,26 @@ export function CardDetailsModal() {
   useEffect(() => {
     if (!openCardId) return;
     setEditing(false);
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     panel.current?.focus();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') closeCard();
+      if (event.key === 'Tab') {
+        const elements = panel.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input, textarea, select, [tabindex="0"]');
+        if (!elements?.length) { event.preventDefault(); return; }
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || document.activeElement === panel.current)) { event.preventDefault(); first.focus(); }
+      }
     }
     window.addEventListener('keydown', onKey);
     return () => {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus();
     };
   }, [openCardId, closeCard]);
 
@@ -71,11 +82,11 @@ export function CardDetailsModal() {
         <header className="details-header">
           <div className="details-heading">
             <p className="eyebrow details-eyebrow">Na coluna {column.title}</p>
+            <h2 id="details-title" className="details-title">{editing ? 'Editar cartão' : card.title}</h2>
             {editing ? (
               <CardForm card={card} onSave={handleSave} onCancel={() => setEditing(false)} />
             ) : (
               <>
-                <h2 id="details-title" className="details-title">{card.title}</h2>
                 <p className="details-description">{card.description || 'Sem descrição.'}</p>
               </>
             )}
@@ -90,6 +101,7 @@ export function CardDetailsModal() {
           Criado em {formatDateTime(card.createdAt)} · Atualizado em {formatDateTime(card.updatedAt)}
         </p>
         <div className="details-body">
+          <CardAttachments key={card.id} card={card} />
           <CommentSection cardId={card.id} />
           <ActivityLog cardId={card.id} />
         </div>
